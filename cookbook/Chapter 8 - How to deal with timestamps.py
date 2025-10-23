@@ -7,7 +7,7 @@ import polars as pl
 
 # Read it, and remove the last row
 popcon = pl.read_csv(
-    "./data/popularity-contest",
+    "../data/popularity-contest",
     separator = " ",
     has_header = True,
     ignore_errors = True)[:-1]
