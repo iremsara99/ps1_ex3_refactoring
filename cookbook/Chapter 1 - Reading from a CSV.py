@@ -1,6 +1,8 @@
 # %%
 import pandas as pd
 import matplotlib.pyplot as plt
+import polars as pl
+import seaborn as sns
 
 
 # %%
@@ -14,13 +16,17 @@ import matplotlib.pyplot as plt
 broken_df = pd.read_csv("../data/bikes.csv", encoding="ISO-8859-1")
 
 # TODO: please load the data with the Polars library (do not forget to import Polars at the top of the script) and call it pl_broken_df
+pl_broken_df = pl.read_csv("../data/bikes.csv", encoding="ISO-8859-1")
+
+
+
 
 # %%
 # Look at the first 3 rows
 broken_df[:3]
 
 # TODO: do the same with your polars data frame, pl_broken_df
-
+pl_broken_df.slice(offset=0, length =3)
 # %%
 # You'll notice that this is totally broken! `read_csv` has a bunch of options that will let us fix that, though. Here we'll
 
@@ -41,7 +47,13 @@ fixed_df = pd.read_csv(
 fixed_df[:3]
 
 # TODO: do the same (or similar) with polars
-
+fixed_df_pl = pl.read_csv(
+    "../data/bikes.csv",
+    separator = ";",
+    encoding = "latin1",
+    try_parse_dates = True,
+)
+fixed_df_pl.slice(offset=0, length=3)
 
 # %%
 # Selecting a column
@@ -51,14 +63,18 @@ fixed_df[:3]
 fixed_df["Berri 1"]
 
 # TODO: how would you do this with a Polars data frame?
-
+fixed_df_pl.select(["Date","Berri 1"])
 
 # %%
 # Plotting is quite easy in Pandas
 fixed_df["Berri 1"].plot()
 
 # TODO: how would you do this with a Polars data frame?
-
+plt.plot(fixed_df_pl.select('Date'), fixed_df_pl.select('Berri 1'))
+plt.margins(x=0)
+plt.gca().xaxis.set_major_locator(mdates.MonthLocator())
+plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%b %Y'))
+plt.show()
 
 # %%
 # We can also plot all the columns just as easily. We'll make it a little bigger, too.
@@ -67,3 +83,9 @@ fixed_df["Berri 1"].plot()
 fixed_df.plot(figsize=(15, 10))
 
 # TODO: how would you do this with a Polars data frame? With Polars data frames you might have to use the Seaborn library and it mmight not work out of the box as with pandas.
+fig, ax = plt.subplots(figsize = (15,10))
+
+for col in fixed_df_pl.columns:
+    if col != 'Date':
+        sns.lineplot(x= fixed_df_pl['Date'], y= fixed_df[col], ax=ax, label=col)
+plt.show()
